@@ -9,7 +9,7 @@ class FlockController(object):
     def stop(self):
         return
 
-class FlockControllerRoster(object):
+class FlockRoster(object):
     roster_instance = None
 
     def __init__(self):
@@ -25,9 +25,9 @@ class FlockControllerRoster(object):
         """ Returns the singleton instance of the controller roster. Always use
             this method to get the reference to the controller roster.
         """
-        if FlockControllerRoster.roster_instance == None:
-            FlockControllerRoster.roster_instance = FlockControllerRoster()
-        return FlockControllerRoster.roster_instance
+        if FlockRoster.roster_instance == None:
+            FlockRoster.roster_instance = FlockRoster()
+        return FlockRoster.roster_instance
 
     def start(self):
         """ Start all controllers present in the roster.
