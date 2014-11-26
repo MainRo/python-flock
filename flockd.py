@@ -7,6 +7,7 @@ import os.path
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol
 
+from flock.controller_factory import ControllerFactory
 from flock.controller.rfxcom.protocol import RfxcomProtocol
 from flock.controller.rfxcom.transport import RfxcomTransport
 from flock.controller.enocean.protocol import EnoceanProtocol
@@ -33,17 +34,6 @@ if __name__ == '__main__':
     else:
         logging.getLogger().setLevel(logging.CRITICAL)
 
+    factory = ControllerFactory(reactor)
     frontend = Frontend(options.port, reactor)
-    rfxcom = RfxcomProtocol()
-    rfxcom.set_frontend(frontend)
-
-    enocean = EnoceanProtocol()
-    enocean.set_frontend(frontend)
-
-    if os.path.isfile('/dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1XR4Q78-if00-port0'):
-        RfxcomTransport(rfxcom, '/dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1XR4Q78-if00-port0', reactor)
-    if os.path.isfile('/dev/serial/by-id/usb-EnOcean_GmbH_EnOcean_USB_300_DA_FTVJ66M0-if00-port0'):
-        EnoceanTransport(enocean,'/dev/serial/by-id/usb-EnOcean_GmbH_EnOcean_USB_300_DA_FTVJ66M0-if00-port0', reactor)
-    if os.path.isfile('/dev/serial/by-id/usb-EnOcean_GmbH_EnOcean_USB_300_DA_FTWTOMA2-if00-port0'):
-        EnoceanTransport(enocean,'/dev/serial/by-id/usb-EnOcean_GmbH_EnOcean_USB_300_DA_FTWTOMA2-if00-port0', reactor)
     reactor.run()

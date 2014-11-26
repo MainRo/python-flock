@@ -1,30 +1,8 @@
 from unittest import TestCase
-from mock import patch, call
+from mock import Mock, patch, call
 from flock.protocol import FlockProtocol
-from flock.message import FlockMessage
-
 
 class FlockProtocolTestCase(TestCase):
-    def setUp(self):
-        return
-
-    """
-    def test_message(self):
-        msg1 = FlockMessage()
-        msg2 = FlockMessage()
-        protocol = FlockProtocol()
-        protocol.push_message(msg1)
-        protocol.push_message(msg2)
-
-        self.assertIs(msg1, protocol.pop_message())
-        self.assertIs(msg2, protocol.pop_message())
-        return
-
-    def test_pop_message_empty(self):
-        protocol = FlockProtocol()
-        self.assertIsNone(protocol.pop_message())
-    """
-
     @patch.object(FlockProtocol, 'byte_received')
     def test_process_one_byte(self, test_byte_received):
         protocol = FlockProtocol()
@@ -37,4 +15,12 @@ class FlockProtocolTestCase(TestCase):
         protocol.dataReceived('\x01\x02\x03\x04')
         expected = [call('\x01'), call('\x02'), call('\x03'), call('\x04')]
         self.assertEqual(expected, test_byte_received.call_args_list)
+
+    @patch('flock.protocol.FlockRoster')
+    def test_push_message(self, mock_roster):
+        mock_roster.instantiate.return_value = mock_roster
+        message = Mock()
+        protocol = FlockProtocol()
+        protocol.push_message(message)
+        mock_roster.send_report.assert_called_once_with(message)
 

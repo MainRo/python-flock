@@ -1,13 +1,10 @@
+import logging
 
-class FlockController(object):
-    def __init__(self):
-        return
-
-    def start(self):
-        return
-
-    def stop(self):
-        return
+class Controller(object):
+    def __init__(self, path, protocol_name, protocol):
+        self.path = path
+        self.protocol_name = protocol_name
+        self.protocol = protocol
 
 class FlockRoster(object):
     roster_instance = None
@@ -18,6 +15,7 @@ class FlockRoster(object):
         """
         self.started = False
         self.controllers = []
+        self.frontends = []
         return
 
     @staticmethod
@@ -29,31 +27,7 @@ class FlockRoster(object):
             FlockRoster.roster_instance = FlockRoster()
         return FlockRoster.roster_instance
 
-    def start(self):
-        """ Start all controllers present in the roster.
-        """
-        if self.started == True:
-            return -1
-
-        for controller in self.controllers:
-            controller.start()
-
-        self.started = True
-        return 0
-
-    def stop(self):
-        """ Stops all controllers present in the roster.
-        """
-        if self.started == False:
-            return -1
-
-        for controller in self.controllers:
-            controller.stop()
-
-        self.started = False
-        return 0
-
-    def attach(self, controller):
+    def attach_controller(self, controller):
         """ Add a controller to the roster. The roster must be stopped to call
             this method.
             returns 0 if success, -1 otherwise
@@ -61,9 +35,13 @@ class FlockRoster(object):
         if self.started == True:
             return -1
         self.controllers.append(controller)
+        logging.debug("attached controller " + controller.path)
         return 0
 
-    def detach(self, controller):
+    def detach_controller(self, path):
+        return
+
+    def detach_controller(self, controller):
         """ Removes a controller from the roster. The roster must be stopped to
             call this method.
             returns 0 if success, -1 otherwise
@@ -71,4 +49,33 @@ class FlockRoster(object):
         if self.started == True:
             return -1
         self.controllers.remove(controller)
+        logging.debug("detached controller " + controller.path)
         return 0
+
+    def attach_frontend(self, frontend):
+        """ Add a frontend to the roster. The roster must be stopped to call
+            this method.
+            returns 0 if success, -1 otherwise
+        """
+        if self.started == True:
+            return -1
+        self.frontends.append(frontend)
+        logging.debug("attached frontend")
+        return 0
+
+    def detach_frontend(self, frontend):
+        """ Removes a frontend from the roster. The roster must be stopped to
+            call this method.
+            returns 0 if success, -1 otherwise
+        """
+        if self.started == True:
+            return -1
+        self.frontends.remove(frontend)
+        logging.debug("detached frontend")
+        return 0
+
+    def send_report(self, message):
+        """ Send a report to all frontends.
+        """
+        for frontend in self.frontends:
+            frontend.report_received(message)

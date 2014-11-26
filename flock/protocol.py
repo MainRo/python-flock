@@ -1,8 +1,6 @@
-from twisted.internet import reactor
 from twisted.internet.protocol import Protocol
-from collections import deque
 
-from flock.frontend import Frontend
+from flock.roster import FlockRoster
 
 class FlockProtocol(Protocol):
     """ The FlockProtocol class is the base class for all Smart Home controllers.
@@ -11,7 +9,7 @@ class FlockProtocol(Protocol):
     """
 
     def __init__(self):
-        self.frontend = None
+        return
 
     def dataReceived(self, data):
         """ Process some data received on the controller to process them. This
@@ -36,12 +34,9 @@ class FlockProtocol(Protocol):
         """
         return None
 
-    def set_frontend(self, frontend):
-        self.frontend = frontend
-
     def push_message(self, message):
         """ Pushes a message to the message list.
         """
-        if self.frontend != None:
-            self.frontend.message_received(message)
+        roster = FlockRoster.instantiate()
+        roster.send_report(message)
 
