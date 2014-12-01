@@ -144,7 +144,7 @@ class EnoceanProtocol(EnoceanReceiver):
         message.load(type, data, optional_data)
         logging.info(message)
         if message.is_valid() == True:
-            self.push_message(message)
+            self.report_message(message)
         else:
             logging.warning('received invalid message. type: ' + str(type) +
                     'data: ' + data + 'optional_data: ' + optional_data)

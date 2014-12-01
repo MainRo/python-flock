@@ -17,7 +17,7 @@ class FlockProtocol(Protocol):
             Inherited classes must either overload this method if they can
             process multiple bytes at once, or overload byte_received.
             Received messages must be pushed to the protocol queue by calling
-            the push_message method.
+            the report_message method.
         """
         count = len(data)
         i = 0
@@ -30,12 +30,12 @@ class FlockProtocol(Protocol):
             This method must be overriden by inherited classes to process the
             data byte per byte.
             Received messages must be pushed to the protocol queue by calling
-            the push_message method.
+            the report_message method.
         """
         return None
 
-    def push_message(self, message):
-        """ Pushes a message to the message list.
+    def report_message(self, message):
+        """ Reports a message to the message list.
         """
         roster = FlockRoster.instantiate()
         roster.send_report(message)

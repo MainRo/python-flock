@@ -17,10 +17,10 @@ class FlockProtocolTestCase(TestCase):
         self.assertEqual(expected, test_byte_received.call_args_list)
 
     @patch('flock.protocol.FlockRoster')
-    def test_push_message(self, mock_roster):
+    def test_report_message(self, mock_roster):
         mock_roster.instantiate.return_value = mock_roster
         message = Mock()
         protocol = FlockProtocol()
-        protocol.push_message(message)
+        protocol.report_message(message)
         mock_roster.send_report.assert_called_once_with(message)
 

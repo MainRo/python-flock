@@ -159,7 +159,7 @@ class RfxcomHsm(Hsm):
             message = RfxcomMessage()
             message.load(packet)
             logging.info(message)
-            hsm.protocol.push_message(message)
+            hsm.protocol.report_message(message)
             return self
 
     def __init__(self, protocol):
