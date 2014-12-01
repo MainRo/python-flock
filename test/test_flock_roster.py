@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mock import MagicMock, patch, call
-from flock.roster import FlockRoster
+from flock.roster import Controller, FlockRoster
 from flock.message import FlockMessage
 from twisted.internet.protocol import Protocol
 
@@ -20,12 +20,12 @@ class FlockRosterTestCase(TestCase):
 
     def test_attach_controller(self):
         roster = FlockRoster.instantiate()
-        controller = Protocol()
+        controller = Controller('foo', 'bar', 'prot')
         self.assertEqual(0, roster.attach_controller(controller))
 
     def test_detach_controller(self):
         roster = FlockRoster.instantiate()
-        controller = Protocol()
+        controller = Controller('foo', 'bar', 'prot')
         roster.attach_controller(controller)
         self.assertEqual(0, roster.detach_controller(controller))
 
