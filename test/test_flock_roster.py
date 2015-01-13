@@ -52,6 +52,32 @@ class FlockRosterTestCase(TestCase):
         frontend1.report_received.assert_called_once_with(message)
         frontend2.report_received.assert_called_once_with(message)
 
+    @patch('twisted.internet.protocol')
+    def test_send_message(self, mock_protocol):
+        roster = FlockRoster.instantiate()
+        controller = Controller('foo', 'bar', mock_protocol)
+        roster.attach_controller(controller)
+
+        message = FlockMessage()
+        message.protocol = 'bar'
+        roster.send_message(message)
+        mock_protocol.send_message.assert_called_once_with(message)
+
+    @patch('twisted.internet.protocol')
+    @patch('twisted.internet.protocol')
+    def test_send_message_on_one_controller(self, mock_protocol1, mock_protocol2):
+        roster = FlockRoster.instantiate()
+        controller1 = Controller('foo', 'bar', mock_protocol1)
+        controller2 = Controller('foo', 'bar1', mock_protocol2)
+        roster.attach_controller(controller1)
+        roster.attach_controller(controller2)
+
+        message = FlockMessage()
+        message.protocol = 'bar'
+        roster.send_message(message)
+        mock_protocol1.send_message.assert_called_once_with(message)
+        self.assertEqual(0, mock_protocol2.send_message.call_count)
+
     """
     @patch.object(FlockController, 'start')
     def test_start(self, test_start):

@@ -40,3 +40,8 @@ class FlockProtocol(Protocol):
         roster = FlockRoster.instantiate()
         roster.send_report(message)
 
+    def send_message(self, message):
+        """ Sends a message to the controller. This method must be overloaded by
+            controller protocol implementations.
+        """
+

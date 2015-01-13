@@ -79,3 +79,12 @@ class FlockRoster(object):
         """
         for frontend in self.frontends:
             frontend.report_received(message)
+
+    def send_message(self, message):
+        """ Send a message to the first controller that suppports the message
+            protocol.
+        """
+        for controller in self.controllers:
+            if controller.protocol_name == message.protocol:
+                controller.protocol.send_message(message)
+                break

@@ -27,3 +27,8 @@ class EnoceanProtocolTestCase(TestCase):
         protocol.packet_received(EnoceanMessage.PACKET_TYPE_RADIO, data, '')
 #        self.assertIs(None, protocol.pop_message())
 
+    def test_send_message(self):
+        protocol = EnoceanProtocol()
+        message = FlockMessage()
+        protocol.send_message(message)
+

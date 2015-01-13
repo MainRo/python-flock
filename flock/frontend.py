@@ -5,6 +5,7 @@ from twisted.internet.protocol import Factory
 from twisted.protocols import amp
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from flock.roster import FlockRoster
+from flock.message import FlockMessage
 
 
 # client API
@@ -12,10 +13,10 @@ class MessageReceived(amp.Command):
     arguments = [('message', amp.String())]
     response = [('status', amp.Boolean())]
 
-class FlockClient(amp.AMP):
-    @MessageReceived.responder
-    def message_received(self, message):
-        return
+class SetState(amp.Command):
+    arguments = [('message', amp.String())]
+    response = [('status', amp.Boolean())]
+
 
 class FlockServer(amp.AMP):
     def connectionMade(self):
@@ -28,8 +29,23 @@ class FlockServer(amp.AMP):
         roster.detach_frontend(self)
         logging.debug("disconnected")
 
+    @SetState.responder
+    def set_state(self, message):
+        logging.debug("set_state" + message)
+        message = json.loads(message)
+        action = FlockMessage()
+        action.device_id = message['id']
+        action.protocol = message['protocol']
+        action.private_data = message['private_data']
+        action.attributes[FlockMessage.MSG_ATTRIBUTE_SWITCH_BISTATE] = message['state']
+        roster = FlockRoster.instantiate()
+        roster.send_message(action)
+        return {'status': True}
+
     def report_received(self, message):
-        """ Sends the received message to the endpoint serialized as javascript.
+        """
+            Sends the received message to the endpoint serialized as javascript.
+            @todo flatten message as AMP fields.
         """
         json_message = json.dumps(message, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         self.callRemote(MessageReceived, message=json_message)

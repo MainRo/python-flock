@@ -136,6 +136,10 @@ class RfxcomHsm(Hsm):
         def on_timer1(self, hsm):
             return self
 
+        def send_packet(self, hsm, packet):
+            logging.warning('trying to send message in invalid state')
+            return self
+
     class SendResetState(BaseState):
         def on_entry(self, hsm, old_state):
             hsm.protocol.transport.flushInput()
@@ -156,10 +160,27 @@ class RfxcomHsm(Hsm):
     class RunningState(BaseState):
         def process_packet(self, hsm, packet):
             logging.debug(packet.encode('hex'))
+            '''
+            @todo move this outside the Hsm class. We may return an additional
+            return code with the loaded packet so the the protocol can generate
+            and notify the message.
+            '''
             message = RfxcomMessage()
             message.load(packet)
             logging.info(message)
-            hsm.protocol.report_message(message)
+            if message.is_valid() == True:
+                hsm.protocol.report_message(message)
+            return self
+
+        def send_packet(self, hsm, packet):
+            logging.debug(packet.encode('hex'))
+            hsm.protocol.transport.write(packet)
+            '''
+            for now also report the packet immediatly to update the observers.
+            @todo : extend state machine to handle answers from transceiver
+            and implement a sending queue
+            '''
+            self.process_packet(hsm, packet)
             return self
 
     def __init__(self, protocol):
@@ -177,6 +198,8 @@ class RfxcomHsm(Hsm):
     def on_timer1(self):
         return self.dispatch(self.current_state.on_timer1)
 
+    def send_packet(self, packet):
+        return self.dispatch(self.current_state.send_packet, packet)
 
 class RfxcomProtocol(RfxcomReceiver):
     def __init__(self):
@@ -197,3 +220,14 @@ class RfxcomProtocol(RfxcomReceiver):
     def packet_received(self, data):
         self.__hsm.process_packet(data)
 
+    def send_message(self, message):
+        rfxcom_message = RfxcomMessage(message)
+        logging.debug("message to send is " + str(message))
+        packet = rfxcom_message.dump()
+        if packet != None:
+            logging.info("sending rfxcom message: " + str(message))
+            self.__hsm.send_packet(packet)
+        else:
+            logging.error("unable to dump rfxcom message " + str(message))
+
+        return
