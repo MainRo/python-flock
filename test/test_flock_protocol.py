@@ -16,11 +16,11 @@ class FlockProtocolTestCase(TestCase):
         expected = [call('\x01'), call('\x02'), call('\x03'), call('\x04')]
         self.assertEqual(expected, test_byte_received.call_args_list)
 
-    @patch('flock.protocol.FlockRoster')
-    def test_report_message(self, mock_roster):
-        mock_roster.instantiate.return_value = mock_roster
+    @patch('flock.protocol.Router')
+    def test_report_message(self, mock_router):
+        mock_router.instantiate.return_value = mock_router
         message = Mock()
         protocol = FlockProtocol()
         protocol.report_message(message)
-        mock_roster.send_report.assert_called_once_with(message)
+        mock_router.send_report.assert_called_once_with(message)
 

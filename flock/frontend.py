@@ -4,7 +4,7 @@ from twisted.internet import reactor
 from twisted.internet.protocol import Factory
 from twisted.protocols import amp
 from twisted.internet.endpoints import TCP4ServerEndpoint
-from flock.roster import FlockRoster
+from flock.router import Router
 from flock.message import FlockMessage
 
 
@@ -20,13 +20,13 @@ class SetState(amp.Command):
 
 class FlockServer(amp.AMP):
     def connectionMade(self):
-        roster = FlockRoster.instantiate()
-        roster.attach_frontend(self)
+        router = Router.instantiate()
+        router.attach_frontend(self)
         logging.debug("connected")
 
     def connectionLost(self, reason):
-        roster = FlockRoster.instantiate()
-        roster.detach_frontend(self)
+        router = Router.instantiate()
+        router.detach_frontend(self)
         logging.debug("disconnected")
 
     @SetState.responder
@@ -38,8 +38,8 @@ class FlockServer(amp.AMP):
         action.protocol = message['protocol']
         action.private_data = message['private_data']
         action.attributes[FlockMessage.MSG_ATTRIBUTE_SWITCH_BISTATE] = message['state']
-        roster = FlockRoster.instantiate()
-        roster.send_message(action)
+        router = Router.instantiate()
+        router.send_message(action)
         return {'status': True}
 
     def report_received(self, message):

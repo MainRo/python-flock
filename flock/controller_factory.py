@@ -4,7 +4,7 @@ from flock.controller.rfxcom.protocol import RfxcomProtocol
 from flock.controller.rfxcom.transport import RfxcomTransport
 from flock.controller.enocean.protocol import EnoceanProtocol
 from flock.controller.enocean.transport import EnoceanTransport
-from flock.roster import FlockRoster, Controller
+from flock.router import Router, Controller
 
 class ControllerFactory(object):
     def __init__(self, reactor):
@@ -30,10 +30,10 @@ class ControllerFactory(object):
             controller = Controller(path, 'enocean', protocol)
 
         if controller != None:
-            roster = FlockRoster.instantiate()
-            roster.attach_controller(controller)
+            router = Router.instantiate()
+            router.attach_controller(controller)
 
     def controller_removed(self, path):
-        roster = FlockRoster.instantiate()
-        roster.detach_controller(path)
+        router = Router.instantiate()
+        router.detach_controller(path)
 

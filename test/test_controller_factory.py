@@ -16,20 +16,20 @@ class ControllerFactoryTestCase(TestCase):
     @patch('os.path.exists', return_value=True)
     @patch('os.listdir',
             return_value=['usb-RFXCOM_RFXtrx433_XXXR4242-if00-port0'])
-    @patch('flock.controller_factory.FlockRoster')
-    def test_coldplug_rfxcom(self, mock_roster, mock_listdir, mock_path_exists, mock_rfxcom):
-        mock_roster.instantiate.return_value = mock_roster
+    @patch('flock.controller_factory.Router')
+    def test_coldplug_rfxcom(self, mock_router, mock_listdir, mock_path_exists, mock_rfxcom):
+        mock_router.instantiate.return_value = mock_router
         factory = ControllerFactory(reactor)
-        self.assertEqual(1, mock_roster.attach_controller.call_count)
+        self.assertEqual(1, mock_router.attach_controller.call_count)
 
     @patch('os.path.exists', return_value=True)
     @patch('os.listdir',
             return_value=['usb-UNKNOWN-if00-port0'])
-    @patch('flock.controller_factory.FlockRoster')
-    def test_coldplug_unknown_controller(self, mock_roster, mock_listdir, mock_path_exists):
-        mock_roster.instantiate.return_value = mock_roster
+    @patch('flock.controller_factory.Router')
+    def test_coldplug_unknown_controller(self, mock_router, mock_listdir, mock_path_exists):
+        mock_router.instantiate.return_value = mock_router
         factory = ControllerFactory(reactor)
-        self.assertEqual(0, mock_roster.attach_controller.call_count)
+        self.assertEqual(0, mock_router.attach_controller.call_count)
 
     @patch('flock.controller_factory.EnoceanTransport')
     @patch('flock.controller_factory.RfxcomTransport')
@@ -37,10 +37,10 @@ class ControllerFactoryTestCase(TestCase):
     @patch('os.listdir',
             return_value=['usb-RFXCOM_RFXtrx433_XXXR4242-if00-port0',
                           'usb-EnOcean_GmbH_EnOcean_USB_300_DA_XXXX4242-if00-port0'])
-    @patch('flock.controller_factory.FlockRoster')
-    def test_coldplug_rfxcom_enocean(self, mock_roster, mock_listdir,
+    @patch('flock.controller_factory.Router')
+    def test_coldplug_rfxcom_enocean(self, mock_router, mock_listdir,
             mock_path_exists, mock_rfxcom, mock_enocean):
-        mock_roster.instantiate.return_value = mock_roster
+        mock_router.instantiate.return_value = mock_router
         factory = ControllerFactory(reactor)
-        self.assertEqual(2, mock_roster.attach_controller.call_count)
+        self.assertEqual(2, mock_router.attach_controller.call_count)
 

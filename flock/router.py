@@ -6,11 +6,11 @@ class Controller(object):
         self.protocol_name = protocol_name
         self.protocol = protocol
 
-class FlockRoster(object):
-    roster_instance = None
+class Router(object):
+    router_instance = None
 
     def __init__(self):
-        """ Constructor. Never instantiate a controller roster directly : Use
+        """ Constructor. Never instantiate a controller router directly : Use
             the instantiate method instead.
         """
         self.started = False
@@ -20,15 +20,15 @@ class FlockRoster(object):
 
     @staticmethod
     def instantiate():
-        """ Returns the singleton instance of the controller roster. Always use
-            this method to get the reference to the controller roster.
+        """ Returns the singleton instance of the controller router. Always use
+            this method to get the reference to the controller router.
         """
-        if FlockRoster.roster_instance == None:
-            FlockRoster.roster_instance = FlockRoster()
-        return FlockRoster.roster_instance
+        if Router.router_instance == None:
+            Router.router_instance = Router()
+        return Router.router_instance
 
     def attach_controller(self, controller):
-        """ Add a controller to the roster. The roster must be stopped to call
+        """ Add a controller to the router. The router must be stopped to call
             this method.
             returns 0 if success, -1 otherwise
         """
@@ -42,7 +42,7 @@ class FlockRoster(object):
         return
 
     def detach_controller(self, controller):
-        """ Removes a controller from the roster. The roster must be stopped to
+        """ Removes a controller from the router. The router must be stopped to
             call this method.
             returns 0 if success, -1 otherwise
         """
@@ -53,7 +53,7 @@ class FlockRoster(object):
         return 0
 
     def attach_frontend(self, frontend):
-        """ Add a frontend to the roster. The roster must be stopped to call
+        """ Add a frontend to the router. The router must be stopped to call
             this method.
             returns 0 if success, -1 otherwise
         """
@@ -64,7 +64,7 @@ class FlockRoster(object):
         return 0
 
     def detach_frontend(self, frontend):
-        """ Removes a frontend from the roster. The roster must be stopped to
+        """ Removes a frontend from the router. The router must be stopped to
             call this method.
             returns 0 if success, -1 otherwise
         """

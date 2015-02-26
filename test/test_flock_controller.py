@@ -1,5 +1,5 @@
 from unittest import TestCase
-from flock.roster import Controller
+from flock.router import Controller
 from twisted.internet.protocol import Protocol
 
 class FlockControllerTestCase(TestCase):
