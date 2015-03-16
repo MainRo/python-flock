@@ -1,9 +1,9 @@
 import logging
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.internet.protocol import Protocol
 from flock.protocol import FlockProtocol
 from flock.hsm import Hsm, HsmState
-from flock.controller.rfxcom.message import RfxcomMessage
+from flock.controller.rfxcom.packet import Packet
 
 RESET_PACKET = '\x0D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 STATUS_PACKET = '\x0D\x00\x00\x01\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00'
@@ -158,29 +158,23 @@ class RfxcomHsm(Hsm):
             return hsm.state_running
 
     class RunningState(BaseState):
-        def process_packet(self, hsm, packet):
+        def process_packet(self, hsm, packet_data):
             logging.debug(packet.encode('hex'))
             '''
             @todo move this outside the Hsm class. We may return an additional
             return code with the loaded packet so the the protocol can generate
             and notify the message.
             '''
-            message = RfxcomMessage()
-            message.load(packet)
-            logging.info(message)
-            if message.is_valid() == True:
-                hsm.protocol.report_message(message)
+            packet = Packet()
+            packet.load(packet_data)
+            logging.info(packet)
+            if packet.is_valid() == True:
+                hsm.protocol.publish_packet(packet)
             return self
 
         def send_packet(self, hsm, packet):
             logging.debug(packet.encode('hex'))
             hsm.protocol.transport.write(packet)
-            '''
-            for now also report the packet immediatly to update the observers.
-            @todo : extend state machine to handle answers from transceiver
-            and implement a sending queue
-            '''
-            self.process_packet(hsm, packet)
             return self
 
     def __init__(self, protocol):
@@ -231,3 +225,12 @@ class RfxcomProtocol(RfxcomReceiver):
             logging.error("unable to dump rfxcom message " + str(message))
 
         return
+
+    def send_packet(self, packet):
+        d = defer.Deferred()
+        self.__hsm.send_packet(packet)
+        # simulate systematic success for now
+        # @todo : call deferred when answer is received
+        self.reactor.callLater(0, d.callback, None)
+        return d;
+

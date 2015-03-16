@@ -34,12 +34,6 @@ class FlockProtocol(Protocol):
         """
         return None
 
-    def report_message(self, message):
-        """ Reports a message to the message list.
-        """
-        router = Router.instantiate()
-        router.send_report(message)
-
     def send_message(self, message):
         """ Sends a message to the controller. This method must be overloaded by
             controller protocol implementations.

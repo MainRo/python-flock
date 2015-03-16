@@ -3,7 +3,12 @@ from flock.message import FlockMessage
 
 ENOCEAN_TYPE = 1
 
-class EnoceanMessage(FlockMessage):
+class Packet(object):
+    def __init__(self):
+        self.id = ''
+        self.is_valid = False
+        return
+
     def temperature_loader(self, data, optional_data):
         subtype = ord(data[2])
         temperature = ord(data[3])
@@ -15,21 +20,21 @@ class EnoceanMessage(FlockMessage):
 
         if valid == True:
             temperature = round(temperature, 1)
-            self.attributes[FlockMessage.MSG_ATTRIBUTE_TEMPERATURE] = temperature
-            self.set_valid(True)
+            self.attr_temperature = temperature
+            self.is_valid = True
 
     def four_byte_loader(self, data, optional_data):
         func = ord(data[1]) & 0x3F
-        if func in EnoceanMessage.FUNC_LOADERS.keys():
-            EnoceanMessage.FUNC_LOADERS[func](self, data, optional_data)
+        if func in Packet.FUNC_LOADERS.keys():
+            Packet.FUNC_LOADERS[func](self, data, optional_data)
 
 
     def radio_loader(self, data, optional_data):
         if len(data) < 5: # radio message have rorg + 4 byte data
             return
         rorg = ord(data[0])
-        if rorg in EnoceanMessage.RORG_LOADERS.keys():
-            EnoceanMessage.RORG_LOADERS[rorg](self, data, optional_data)
+        if rorg in Packet.RORG_LOADERS.keys():
+            Packet.RORG_LOADERS[rorg](self, data, optional_data)
 
 
     PACKET_TYPE_RADIO = 1
@@ -61,11 +66,7 @@ class EnoceanMessage(FlockMessage):
     def load(self, type, data, optional_data):
         """ Loads and parses the packet to initialize the message.
         """
-        self.reset()
-        self.type = FlockMessage.MSG_TYPE_REPORT
-        self.protocol = 'enocean'
-        self.device_id = ''
-        if type in EnoceanMessage.TYPE_LOADERS.keys():
-            EnoceanMessage.TYPE_LOADERS[type](self, data, optional_data)
+        if type in Packet.TYPE_LOADERS.keys():
+            Packet.TYPE_LOADERS[type](self, data, optional_data)
 
 

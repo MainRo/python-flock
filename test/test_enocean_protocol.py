@@ -1,4 +1,5 @@
 from unittest import TestCase
+from mock import MagicMock
 from flock.controller.enocean.protocol import EnoceanProtocol
 from flock.controller.enocean.message import EnoceanMessage
 from flock.message import FlockMessage
@@ -10,6 +11,7 @@ class EnoceanProtocolTestCase(TestCase):
 
     def test_valid_packet(self):
         protocol = EnoceanProtocol()
+        protocol.publish_packet = MagicMock()
         data = '\xA5\x02\x05\xFF\x00'
         protocol.packet_received(EnoceanMessage.PACKET_TYPE_RADIO, data, '')
         """

@@ -26,7 +26,10 @@ class Device(object):
 
     def set_features(self, *args):
         """ Sets the list of features supported by the device. Parameters are
-            strings representing supported features.
+            strings representing supported features. Available features are:
+            - temperature
+            - humidity
+            - power_switch
         """
         for arg in args:
             self.features.append(arg)
@@ -51,6 +54,8 @@ class Device(object):
 
 
 class Roster(object):
+    roster_instance = None
+
     def __init__(self, file='~/.flock_roster'):
         """ Creates a new device roster. A path to the roster save path can be
             provided. The default path is '~/.flock_roster'
@@ -59,6 +64,15 @@ class Roster(object):
         self._device_dict = {}
         self._load()
         return
+
+    @staticmethod
+    def instantiate():
+        """ Returns the singleton instance of the device roster. Always use
+            this method to get the reference to the roster.
+        """
+        if Roster.roster_instance == None:
+            Roster.roster_instance = Roster()
+        return Roster.roster_instance
 
     def add_device(self, device):
         """ Adds a device to the roster. Return 0 if success, None otherwise.

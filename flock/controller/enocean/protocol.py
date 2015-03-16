@@ -1,14 +1,13 @@
 import logging
 from flock.hsm import Hsm, HsmState
 from flock.protocol import FlockProtocol
-from flock.controller.enocean.message import EnoceanMessage
+from flock.controller.enocean.packet import Packet
 
 
 class EnoceanPacketHsm(Hsm):
     class BaseState(HsmState):
         def on_data(self, hsm, data):
             return self
-
 
     class SyncState(BaseState):
         def on_data(self, hsm, data):
@@ -18,7 +17,6 @@ class EnoceanPacketHsm(Hsm):
                 hsm.packet_type = None
                 return hsm.state_header
             return self
-
 
     class HeaderState(BaseState):
         def on_entry(self, hsm, old_state):
@@ -140,13 +138,13 @@ class EnoceanProtocol(EnoceanReceiver):
         EnoceanReceiver.__init__(self)
 
     def packet_received(self, type, data, optional_data):
-        message = EnoceanMessage()
-        message.load(type, data, optional_data)
-        logging.info(message)
-        if message.is_valid() == True:
-            self.report_message(message)
+        packet = Packet()
+        packet.load(type, data, optional_data)
+        logging.info(packet)
+        if packet.is_valid == True:
+            self.publish_packet(packet)
         else:
-            logging.warning('received invalid message. type: ' + str(type) +
+            logging.warning('received invalid packet. type: ' + str(type) +
                     'data: ' + data + 'optional_data: ' + optional_data)
 
 

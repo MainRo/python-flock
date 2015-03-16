@@ -5,6 +5,14 @@ class FlockMessage(object):
         and a dump method to respectively load a message from a packet or
         generate a packet from a message.
     """
+
+    class Type(object):
+        # controller messages
+        report = 0
+        set  = 1
+        pair = 2
+        # system messages
+
     MSG_TYPE_REPORT = 0
     MSG_TYPE_ACTION = 1
 
@@ -15,37 +23,30 @@ class FlockMessage(object):
     """ switch state (boolean) """
     MSG_ATTRIBUTE_SWITCH_BISTATE= 2
 
-    def __init__(self, message = None):
+    def __init__(self):
         self.reset()
-        if message != None:
-            self.__init_from(message)
 
     def reset(self):
         self.type = None
-        self.device_id = None   # string containing the protocol unique id of the device.
-        self.protocol = None    # communication protocol used.
+        self.uid = None
+        self.device = None
+        self.namespace = None
+
+        # obsolete fields. @todo : remove
         self.attributes = {}
-        self.private_data = None
         self.__valid = False
 
-    def __init_from(self, message):
-        self.type = message.type
-        self.device_id = message.device_id
-        self.protocol = message.protocol
-        self.private_data = message.private_data
-        self.set_valid(message.is_valid())
-        self.attributes = message.attributes.copy()
-
-    def set_valid(self, state):
-        self.__valid = state
-
-    def is_valid(self):
-        return self.__valid
+    def __eq__(self, other):
+        if isinstance(other, FlockMessage):
+            return self.type == other.type and \
+                    self.uid == other.uid and \
+                    self.device == other.device and \
+                    self.namespace == other.namespace
+        return NotImplemented
 
     def __str__(self):
         result  = "type: " + str(self.type) + ","
-        result += "device_id: " + self.device_id + ","
-        result += "protocol: " + self.protocol + ","
+        result += "uid: " + self.uid+ ","
         result += "attributes : ["
         first = True
         for key, value in self.attributes.iteritems():

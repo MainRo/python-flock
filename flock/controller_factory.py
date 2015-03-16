@@ -1,10 +1,10 @@
 import os, string
 
-from flock.controller.rfxcom.protocol import RfxcomProtocol
+from flock.handler.rfxcom.rfxcom import RfxcomHandler
 from flock.controller.rfxcom.transport import RfxcomTransport
-from flock.controller.enocean.protocol import EnoceanProtocol
+from flock.handler.enocean import EnoceanHandler
 from flock.controller.enocean.transport import EnoceanTransport
-from flock.router import Router, Controller
+from flock.router import Router
 
 class ControllerFactory(object):
     def __init__(self, reactor):
@@ -19,19 +19,17 @@ class ControllerFactory(object):
                 self.controller_added(usb_serial_path+controller_path)
 
     def controller_added(self, path):
-        controller = None
+        handler = None
         if string.find(path, 'RFXCOM_RFXtrx433') >= 0:
-            protocol = RfxcomProtocol()
-            RfxcomTransport(protocol, path, self.reactor)
-            controller = Controller(path, 'rfxcom', protocol)
+            handler = RfxcomHandler(self.reactor)
+            RfxcomTransport(handler, path, self.reactor)
         elif string.find(path, 'EnOcean_GmbH_EnOcean_USB_300') >= 0:
-            protocol = EnoceanProtocol()
-            EnoceanTransport(protocol, path, self.reactor)
-            controller = Controller(path, 'enocean', protocol)
+            handler = EnoceanHandler(self.reactor)
+            EnoceanTransport(handler, path, self.reactor)
 
-        if controller != None:
+        if handler != None:
             router = Router.instantiate()
-            router.attach_controller(controller)
+            router.attach_handler(handler)
 
     def controller_removed(self, path):
         router = Router.instantiate()

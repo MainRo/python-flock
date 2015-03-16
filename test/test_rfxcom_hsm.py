@@ -56,7 +56,6 @@ class RfxcomHsmTestCase(TestCase):
         packet = '\x0b\x11\x00\x06\x00\xc3\x3e\xae\x02\x00\x00\x70'
         hsm.send_packet(packet)
         mock_transport.write.assert_called_with(packet)
-        mock_protocol.report_message.assert_called_once_with(ANY)
 
     @patch.object(reactor, 'callLater')
     @patch('test.test_rfxcom_hsm.TestTransport', create=True)

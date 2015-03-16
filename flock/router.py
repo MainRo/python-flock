@@ -1,10 +1,5 @@
 import logging
-
-class Controller(object):
-    def __init__(self, path, protocol_name, protocol):
-        self.path = path
-        self.protocol_name = protocol_name
-        self.protocol = protocol
+from flock.roster import Roster
 
 class Router(object):
     router_instance = None
@@ -14,42 +9,39 @@ class Router(object):
             the instantiate method instead.
         """
         self.started = False
-        self.controllers = []
+        self.handlers = []
         self.frontends = []
         return
 
     @staticmethod
     def instantiate():
-        """ Returns the singleton instance of the controller router. Always use
-            this method to get the reference to the controller router.
+        """ Returns the singleton instance of the message router. Always use
+            this method to get the reference to the router.
         """
         if Router.router_instance == None:
             Router.router_instance = Router()
         return Router.router_instance
 
-    def attach_controller(self, controller):
-        """ Add a controller to the router. The router must be stopped to call
+    def attach_handler(self, handler):
+        """ Add a handler to the router. The router must be stopped to call
             this method.
             returns 0 if success, -1 otherwise
         """
         if self.started == True:
             return -1
-        self.controllers.append(controller)
-        logging.debug("attached controller " + controller.path)
+        self.handlers.append(handler)
+        logging.debug("attached handler" + str(handler))
         return 0
 
-    def detach_controller(self, path):
-        return
-
-    def detach_controller(self, controller):
-        """ Removes a controller from the router. The router must be stopped to
+    def detach_handler(self, handler):
+        """ Removes a handler from the router. The router must be stopped to
             call this method.
             returns 0 if success, -1 otherwise
         """
         if self.started == True:
             return -1
-        self.controllers.remove(controller)
-        logging.debug("detached controller " + controller.path)
+        self.handlers.remove(handler)
+        logging.debug("detached handler" + str(handler))
         return 0
 
     def attach_frontend(self, frontend):
@@ -74,17 +66,26 @@ class Router(object):
         logging.debug("detached frontend")
         return 0
 
-    def send_report(self, message):
-        """ Send a report to all frontends.
+    def publish(self, message):
+        """ publish a message to all frontends.
         """
         for frontend in self.frontends:
-            frontend.report_received(message)
+            frontend.event(message)
 
-    def send_message(self, message):
-        """ Send a message to the first controller that suppports the message
-            protocol.
+    def call(self, message):
+        """ route a message to the appropriate handler.
+            Returns a deferred if the message is routed.
+            Returns None otherwise.
         """
-        for controller in self.controllers:
-            if controller.protocol_name == message.protocol:
-                controller.protocol.send_message(message)
-                break
+        roster = Roster.instantiate()
+        device = roster.get_device(message.uid)
+        if device is None:
+            return None
+
+        for handler in self.handlers:
+            d = handler.invoke(device, message)
+            if d != None:
+                return d
+
+        return None
+

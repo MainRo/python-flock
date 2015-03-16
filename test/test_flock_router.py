@@ -1,11 +1,11 @@
 from unittest import TestCase
 from mock import MagicMock, patch, call
-from flock.router import Controller, Router
+from flock.router import Router
 from flock.message import FlockMessage
 from twisted.internet.protocol import Protocol
 
 class TestFrontend(Protocol):
-    def report_received(self):
+    def event(self, message):
         return
 
 class RouterTestCase(TestCase):
@@ -18,16 +18,16 @@ class RouterTestCase(TestCase):
         self.assertIs(router1, router2)
 
 
-    def test_attach_controller(self):
+    def test_attach_handler(self):
         router = Router.instantiate()
-        controller = Controller('foo', 'bar', 'prot')
-        self.assertEqual(0, router.attach_controller(controller))
+        handler = MagicMock()
+        self.assertEqual(0, router.attach_handler(handler))
 
-    def test_detach_controller(self):
+    def test_detach_handler(self):
         router = Router.instantiate()
-        controller = Controller('foo', 'bar', 'prot')
-        router.attach_controller(controller)
-        self.assertEqual(0, router.detach_controller(controller))
+        handler = MagicMock()
+        router.attach_handler(handler)
+        self.assertEqual(0, router.detach_handler(handler))
 
 
     def test_attach_frontend(self):
@@ -41,42 +41,50 @@ class RouterTestCase(TestCase):
         router.attach_frontend(frontend)
         self.assertEqual(0, router.detach_frontend(frontend))
 
-    def test_send_report(self):
+    def test_publish(self):
         router = Router.instantiate()
         frontend1 = MagicMock()
         frontend2 = MagicMock()
         router.attach_frontend(frontend1)
         router.attach_frontend(frontend2)
         message = FlockMessage()
-        router.send_report(message)
-        frontend1.report_received.assert_called_once_with(message)
-        frontend2.report_received.assert_called_once_with(message)
+        router.publish(message)
+        frontend1.event.assert_called_once_with(message)
+        frontend2.event.assert_called_once_with(message)
 
-    @patch('twisted.internet.protocol')
-    def test_send_message(self, mock_protocol):
+    @patch('flock.router.Roster')
+    def test_call(self, mock_roster):
         router = Router.instantiate()
-        controller = Controller('foo', 'bar', mock_protocol)
-        router.attach_controller(controller)
+        device = {}
+        roster = MagicMock()
+        roster.get_device = MagicMock(return_value=device)
+        mock_roster.instantiate = MagicMock(return_value=roster)
+        handler = MagicMock()
+        router.attach_handler(handler)
 
         message = FlockMessage()
-        message.protocol = 'bar'
-        router.send_message(message)
-        mock_protocol.send_message.assert_called_once_with(message)
+        message.uid = '42'
+        router.call(message)
+        handler.invoke.assert_called_once_with(device, message)
 
-    @patch('twisted.internet.protocol')
-    @patch('twisted.internet.protocol')
-    def test_send_message_on_one_controller(self, mock_protocol1, mock_protocol2):
+    @patch('flock.router.Roster')
+    def test_call_on_one_controller(self, mock_roster):
         router = Router.instantiate()
-        controller1 = Controller('foo', 'bar', mock_protocol1)
-        controller2 = Controller('foo', 'bar1', mock_protocol2)
-        router.attach_controller(controller1)
-        router.attach_controller(controller2)
+        device = {}
+        roster = MagicMock()
+        roster.get_device = MagicMock(return_value=device)
+        mock_roster.instantiate = MagicMock(return_value=roster)
+        handler1 = MagicMock()
+        handler1.invoke = MagicMock(return_value=None)
+        handler2 = MagicMock()
+        router.attach_handler(handler1)
+        router.attach_handler(handler2)
 
         message = FlockMessage()
-        message.protocol = 'bar'
-        router.send_message(message)
-        mock_protocol1.send_message.assert_called_once_with(message)
-        self.assertEqual(0, mock_protocol2.send_message.call_count)
+        message.uid = '42'
+        router.call(message)
+        handler1.invoke.assert_called_once_with(device, message)
+        handler2.invoke.assert_called_once_with(device, message)
 
     """
     @patch.object(FlockController, 'start')

@@ -20,7 +20,7 @@ class ControllerFactoryTestCase(TestCase):
     def test_coldplug_rfxcom(self, mock_router, mock_listdir, mock_path_exists, mock_rfxcom):
         mock_router.instantiate.return_value = mock_router
         factory = ControllerFactory(reactor)
-        self.assertEqual(1, mock_router.attach_controller.call_count)
+        self.assertEqual(1, mock_router.attach_handler.call_count)
 
     @patch('os.path.exists', return_value=True)
     @patch('os.listdir',
@@ -42,5 +42,5 @@ class ControllerFactoryTestCase(TestCase):
             mock_path_exists, mock_rfxcom, mock_enocean):
         mock_router.instantiate.return_value = mock_router
         factory = ControllerFactory(reactor)
-        self.assertEqual(2, mock_router.attach_controller.call_count)
+        self.assertEqual(2, mock_router.attach_handler.call_count)
 
