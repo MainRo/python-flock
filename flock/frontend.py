@@ -34,12 +34,12 @@ class FlockServer(amp.AMP):
         logging.debug("set_state" + message)
         message = json.loads(message)
         action = FlockMessage()
-        action.device_id = message['id']
-        action.protocol = message['protocol']
-        action.private_data = message['private_data']
+        action.uid = message['id']
         action.attributes[FlockMessage.MSG_ATTRIBUTE_SWITCH_BISTATE] = message['state']
+        action.type = FlockMessage.Type.set
+        action.namespace = 'controller'
         router = Router.instantiate()
-        router.send_message(action)
+        router.call(action)
         return {'status': True}
 
     def report_received(self, message):
@@ -47,7 +47,12 @@ class FlockServer(amp.AMP):
             Sends the received message to the endpoint serialized as javascript.
             @todo flatten message as AMP fields.
         """
-        json_message = json.dumps(message, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        legacy_message = object()
+        legacy_message.protocol = 'flock'
+        legacy_message.id = message.uid
+        legacy_message.private_data = ''
+        legacy_message.attributes = message.attributes
+        json_message = json.dumps(legacy_message, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         self.callRemote(MessageReceived, message=json_message)
         return
 
