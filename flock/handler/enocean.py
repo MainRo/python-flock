@@ -9,6 +9,7 @@ class EnoceanHandler(EnoceanProtocol):
     """ Enocean handler
     """
     def __init__(self, reactor):
+        EnoceanProtocol.__init__(self)
         self.roster = Roster.instantiate()
         self.router = Router.instantiate()
         self.reactor = reactor

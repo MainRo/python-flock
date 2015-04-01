@@ -10,6 +10,7 @@ class RfxcomHandler(RfxcomProtocol):
         pairing code for this protocol.
     """
     def __init__(self, reactor):
+        RfxcomProtocol.__init__(self)
         self.roster = Roster.instantiate()
         self.router = Router.instantiate()
         self.reactor = reactor
