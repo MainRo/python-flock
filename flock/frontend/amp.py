@@ -42,7 +42,7 @@ class FlockServer(amp.AMP):
         router.call(action)
         return {'status': True}
 
-    def report_received(self, message):
+    def event(self, message):
         """
             Sends the received message to the endpoint serialized as javascript.
             @todo flatten message as AMP fields.
