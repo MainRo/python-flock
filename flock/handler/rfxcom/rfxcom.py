@@ -2,7 +2,7 @@ from twisted.internet import defer
 from flock.controller.rfxcom.packet import Packet
 from flock.controller.rfxcom.protocol import RfxcomProtocol
 from flock.router import Router
-from flock.roster import Roster
+from flock.roster import Roster, Device
 from flock.message import FlockMessage
 
 class RfxcomHandler(RfxcomProtocol):

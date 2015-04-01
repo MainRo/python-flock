@@ -2,7 +2,7 @@ from twisted.internet import defer
 from flock.controller.enocean.packet import Packet
 from flock.controller.enocean.protocol import EnoceanProtocol
 from flock.router import Router
-from flock.roster import Roster
+from flock.roster import Roster, Device
 from flock.message import FlockMessage
 
 class EnoceanHandler(EnoceanProtocol):
