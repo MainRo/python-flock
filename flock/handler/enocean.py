@@ -36,5 +36,5 @@ class EnoceanHandler(EnoceanProtocol):
             message.attributes[FlockMessage.MSG_ATTRIBUTE_TEMPERATURE] = packet.attr_temperature
         message.uid = device.uid
         message.namespace = 'controller'
-
+        message.type = FlockMessage.Type.report
         return message

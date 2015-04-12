@@ -113,6 +113,7 @@ class EnoceanReceiver(FlockProtocol):
         if self.__hsm != None:
             self.__hsm = None
         self.__hsm = EnoceanPacketHsm()
+        logging.debug("Connected")
 
     def byte_received(self, data):
         if self.__hsm == None:
