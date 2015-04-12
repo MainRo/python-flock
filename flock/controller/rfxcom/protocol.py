@@ -159,7 +159,7 @@ class RfxcomHsm(Hsm):
 
     class RunningState(BaseState):
         def process_packet(self, hsm, packet_data):
-            logging.debug(packet.encode('hex'))
+            logging.debug(packet_data.encode('hex'))
             '''
             @todo move this outside the Hsm class. We may return an additional
             return code with the loaded packet so the the protocol can generate
@@ -168,7 +168,7 @@ class RfxcomHsm(Hsm):
             packet = Packet()
             packet.load(packet_data)
             logging.info(packet)
-            if packet.is_valid() == True:
+            if packet.is_valid == True:
                 hsm.protocol.publish_packet(packet)
             return self
 

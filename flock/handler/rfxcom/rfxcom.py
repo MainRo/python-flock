@@ -45,13 +45,12 @@ class RfxcomHandler(RfxcomProtocol):
                 device.set_features('temperature')
             self.roster.add_device(device)
 
-        message = FLockMessage()
+        message = FlockMessage()
         if hasattr(packet, 'attr_temperature'):
             message.attributes[FlockMessage.MSG_ATTRIBUTE_TEMPERATURE] = packet.attr_temperature
         message.uid = device.uid
         message.namespace = 'controller'
-
-
+        message.type = FlockMessage.Type.report
         return message
 
     def _message_to_packet(self, device, message):
