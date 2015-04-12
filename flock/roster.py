@@ -2,6 +2,7 @@ import random
 import string
 import json
 import os.path
+
 from twisted.internet import reactor, defer
 
 class Device(object):
@@ -56,11 +57,14 @@ class Device(object):
 class Roster(object):
     roster_instance = None
 
-    def __init__(self, file='~/.flock_roster'):
+    def __init__(self, file=None):
         """ Creates a new device roster. A path to the roster save path can be
             provided. The default path is '~/.flock_roster'
         """
-        self._file = file
+        if file == None:
+            self._file = os.path.expanduser('~') + '/.flock_roster'
+        else:
+            self._file = file
         self._device_dict = {}
         self._load()
         return
@@ -127,7 +131,7 @@ class Roster(object):
                 sort_keys=True,
                 indent=4,
                 separators=(',', ': '))
-        f = open(self._file, 'w')
+        f = open(self._file, 'w+')
         f.write(json_list)
         f.close()
         d = defer.Deferred()
