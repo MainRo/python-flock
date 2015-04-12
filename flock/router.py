@@ -69,6 +69,8 @@ class Router(object):
     def publish(self, message):
         """ publish a message to all frontends.
         """
+
+        logging.debug('publishing message' + str(message))
         for frontend in self.frontends:
             frontend.event(message)
 
