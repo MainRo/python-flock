@@ -5,7 +5,7 @@ ENOCEAN_TYPE = 1
 
 class Packet(object):
     def __init__(self):
-        self.id = ''
+        self.id = '-'
         self.is_valid = False
         return
 

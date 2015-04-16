@@ -34,7 +34,6 @@ class FlockMessage(object):
 
         # obsolete fields. @todo : remove
         self.attributes = {}
-        self.__valid = False
 
     def __eq__(self, other):
         if isinstance(other, FlockMessage):
