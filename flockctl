@@ -1,0 +1,57 @@
+#! /usr/bin/python
+
+import argparse
+from twisted.internet import reactor
+from flock.frontend.msgpack.client import FlockMsgClient
+
+
+def print_result(r):
+    print(str(r))
+    return None
+
+def stop_and_exit(r):
+    reactor.stop()
+    return None
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", help="Command to execute", choices=['monitor', 'set', 'list'])
+    parser.add_argument("uid", help="device uid", nargs='?', default=None)
+    parser.add_argument("attribute", help="attribute to set", nargs='?', default=None)
+    parser.add_argument("value", help="value to set on the attribute", nargs='?', default=None)
+    args = parser.parse_args()
+    """
+    if options.verbose == '1':
+        logging.getLogger().setLevel(logging.INFO)
+    elif options.verbose == '2':
+        logging.getLogger().setLevel(logging.DEBUG)
+    else:
+        logging.getLogger().setLevel(logging.CRITICAL)
+    """
+
+    client = FlockMsgClient()
+    if args.command == 'monitor':
+        client.monitor(True)
+
+    elif args.command == 'set':
+        if args.uid == None or args.attribute == None or args.value == None:
+            parser.print_usage()
+            exit()
+        if args.value == 'True':
+            value = True
+        elif args.value == 'False':
+            value = False
+        else:
+            value = args.value
+
+        d = client.set(args.uid, args.attribute, value)
+        d.addCallback(print_result)
+        d.addCallback(stop_and_exit)
+
+    elif args.command == 'list':
+        d = client.list_device()
+        d.addCallback(print_result)
+        d.addCallback(stop_and_exit)
+
+    reactor.run()
+

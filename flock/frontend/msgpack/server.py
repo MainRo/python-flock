@@ -25,6 +25,17 @@ class FlockRPC(MsgpackRPCPubServer):
             yield task.deferLater(reactor, delay, lambda: None)
         defer.returnValue(value)
 
+    def remote_set(self, uid, attribute, value):
+        router = Router.instantiate()
+        message = FlockMessage()
+        message.type = FlockMessage.Type.set
+        message.uid = uid
+        message.namespace = 'controller'
+        if attribute == 'switch_bistate':
+            message.attributes[FlockMessage.MSG_ATTRIBUTE_SWITCH_BISTATE] = value
+        d = router.call(message)
+        return d
+
 class FlockMsgServer(object):
     def __init__(self):
         server = FlockRPC()
