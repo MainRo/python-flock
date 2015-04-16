@@ -59,5 +59,7 @@ class RfxcomHandler(RfxcomProtocol):
         packet.unit_code = device.private['unit_code']
         packet.id = device.protocol_id
         packet.command = Packet.Command.set
+        if FlockMessage.MSG_ATTRIBUTE_SWITCH_BISTATE in message.attributes:
+            packet.attr_state = message.attributes[FlockMessage.MSG_ATTRIBUTE_SWITCH_BISTATE]
         return packet
 
