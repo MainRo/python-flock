@@ -30,7 +30,7 @@ class FlockServer(amp.AMP):
         logging.debug("disconnected")
 
     @SetState.responder
-    def set_state(self, message):
+    def SetState(self, message):
         logging.debug("set_state" + message)
         message = json.loads(message)
         action = FlockMessage()
@@ -47,11 +47,11 @@ class FlockServer(amp.AMP):
             Sends the received message to the endpoint serialized as javascript.
             @todo flatten message as AMP fields.
         """
-        legacy_message = object()
-        legacy_message.protocol = 'flock'
-        legacy_message.id = message.uid
-        legacy_message.private_data = ''
-        legacy_message.attributes = message.attributes
+        legacy_message = {}
+        legacy_message['protocol'] = 'flock'
+        legacy_message['device_id'] = message.uid
+        legacy_message['private_data'] = ''
+        legacy_message['attributes'] = message.attributes
         json_message = json.dumps(legacy_message, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         self.callRemote(MessageReceived, message=json_message)
         return
