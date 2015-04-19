@@ -48,6 +48,8 @@ class RfxcomHandler(RfxcomProtocol):
         message = FlockMessage()
         if hasattr(packet, 'attr_temperature'):
             message.attributes[FlockMessage.MSG_ATTRIBUTE_TEMPERATURE] = packet.attr_temperature
+        if hasattr(packet, 'attr_humidity'):
+            message.attributes[FlockMessage.MSG_ATTRIBUTE_HUMIDITY] = packet.attr_humidity
         message.uid = device.uid
         message.namespace = 'controller'
         message.type = FlockMessage.Type.report
