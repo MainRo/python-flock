@@ -9,7 +9,7 @@ from twisted.internet import reactor
 class RosterTestCase(TestCase):
     def test_instantiate(self):
         roster = Roster()
-        self.assertEqual('~/.flock_roster', roster._file)
+        self.assertEqual('.flock_roster', os.path.basename(roster._file))
 
         roster = Roster('foo')
         self.assertEqual('foo', roster._file)

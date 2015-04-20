@@ -48,6 +48,7 @@ class RouterTestCase(TestCase):
         router.attach_frontend(frontend1)
         router.attach_frontend(frontend2)
         message = FlockMessage()
+        message.uid = '42'
         router.publish(message)
         frontend1.event.assert_called_once_with(message)
         frontend2.event.assert_called_once_with(message)

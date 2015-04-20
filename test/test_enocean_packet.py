@@ -29,7 +29,7 @@ class EnoceanPacketTestCase(TestCase):
         packet = Packet()
         packet.load(Packet.PACKET_TYPE_RADIO, data, optional_data)
         self.assertEqual(True, packet.is_valid)
-        self.assertEqual('', packet.id)
+        self.assertEqual('-', packet.id)
         self.assertEqual(19.3, packet.attr_temperature)
 
     def test_temperature_message(self):
@@ -38,7 +38,7 @@ class EnoceanPacketTestCase(TestCase):
         packet = Packet()
         packet.load(Packet.PACKET_TYPE_RADIO, data, optional_data)
         self.assertEqual(True, packet.is_valid)
-        self.assertEqual('', packet.id)
+        self.assertEqual('-', packet.id)
         self.assertEqual(19.3, packet.attr_temperature)
 
 

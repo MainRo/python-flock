@@ -35,6 +35,7 @@ class EnoceanHandlerTestCase(TestCase):
         expected_message.uid = device.uid
         expected_message.namespace = 'controller'
         expected_message.attributes[FlockMessage.MSG_ATTRIBUTE_TEMPERATURE] = packet.attr_temperature
+        expected_message.type = FlockMessage.Type.report
 
         handler.router.publish.assert_called_once_with(expected_message)
 
