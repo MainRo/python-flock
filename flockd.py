@@ -13,7 +13,8 @@ from flock.controller.rfxcom.transport import RfxcomTransport
 from flock.controller.enocean.protocol import EnoceanProtocol
 from flock.controller.enocean.transport import EnoceanTransport
 
-from flock.frontend import Frontend
+from flock.frontend.amp import Frontend
+from flock.frontend.msgpack.server import FlockMsgServer
 
 
 if __name__ == '__main__':
@@ -36,4 +37,5 @@ if __name__ == '__main__':
 
     factory = ControllerFactory(reactor)
     frontend = Frontend(options.port, reactor)
+    msgpack_frontend = FlockMsgServer()
     reactor.run()
