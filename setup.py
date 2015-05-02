@@ -35,5 +35,5 @@ setup(
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 2',
     ],
-    scripts=['flockd.py'],
+    scripts=['flockd.py', 'flockctl'],
 )
