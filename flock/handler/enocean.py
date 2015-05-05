@@ -24,7 +24,7 @@ class EnoceanHandler(EnoceanProtocol):
     def _packet_to_message(self, packet):
         """ Converts an enocean packet to a message
         """
-        device = self.roster.get_device(packet.id, 'encoean')
+        device = self.roster.get_device(packet.id, 'enocean')
         if device == None:
             device = Device(protocol='enocean', protocol_id=packet.id)
             if hasattr(packet, 'attr_temperature'):
