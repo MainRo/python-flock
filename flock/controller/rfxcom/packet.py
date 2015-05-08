@@ -12,7 +12,7 @@ class Packet(object):
         """ Generic enum for usual commands
         """
         pair = 0
-        set  = 0
+        set  = 1
 
 
     class Type(object):
@@ -118,6 +118,11 @@ class Packet(object):
         packet += chr(0x01) # unit code
         if self.command == self.Command.pair:
             packet += chr(0x07)
+        elif self.command == self.Command.set:
+            if self.attr_state == True: # level
+                packet += chr(0x01)
+            else:
+                packet += chr(0x03)
         else:
             return None
         packet += chr(0x00) # rfu1

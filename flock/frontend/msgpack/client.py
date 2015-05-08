@@ -22,6 +22,11 @@ class FlockMsgClient(object):
         self._actions.append((self._set_request, (d, uid, attribute, value)))
         return d
 
+    def pair(self, protocol):
+        d = defer.Deferred()
+        self._actions.append((self._pair_request, (d, protocol)))
+        return d
+
     def list_device(self):
         d = defer.Deferred()
         self._actions.append((self._list_device_request, d))
@@ -52,6 +57,11 @@ class FlockMsgClient(object):
 
     def _set_request(self, d1, uid, attribute, value):
         d = self._connection.createRequest('set', uid, attribute, value)
+        d.addErrback(self._on_error)
+        d.addCallback(d1.callback)
+
+    def _pair_request(self, d1, protocol):
+        d = self._connection.createRequest('pair', protocol)
         d.addErrback(self._on_error)
         d.addCallback(d1.callback)
 

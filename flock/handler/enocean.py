@@ -14,7 +14,7 @@ class EnoceanHandler(EnoceanProtocol):
         self.router = Router.instantiate()
         self.reactor = reactor
 
-    def invoke(self, device, message):
+    def invoke(self, message):
         return None
 
     def publish_packet(self, packet):

@@ -13,9 +13,13 @@ def stop_and_exit(r):
     reactor.stop()
     return None
 
+epilog = 'Examples: \n'
+epilog += 'Pairing with somfy rts device: \n'
+epilog += 'flockctl pair protocol rts\n'
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command", help="Command to execute", choices=['monitor', 'set', 'list'])
+    parser = argparse.ArgumentParser(epilog=epilog)
+    parser.add_argument("command", help="Command to execute", choices=['monitor', 'set', 'pair', 'list'])
     parser.add_argument("uid", help="device uid", nargs='?', default=None)
     parser.add_argument("attribute", help="attribute to set", nargs='?', default=None)
     parser.add_argument("value", help="value to set on the attribute", nargs='?', default=None)
@@ -45,6 +49,19 @@ if __name__ == '__main__':
             value = args.value
 
         d = client.set(args.uid, args.attribute, value)
+        d.addCallback(print_result)
+        d.addCallback(stop_and_exit)
+
+    elif args.command == 'pair':
+        ''' The pair command has a 'uid' string attribute whose value is the
+            protocol to pair.
+        '''
+        if args.uid == None:
+            parser.print_usage()
+            exit()
+
+        protocol = 'controller:' + args.uid
+        d = client.pair(protocol)
         d.addCallback(print_result)
         d.addCallback(stop_and_exit)
 

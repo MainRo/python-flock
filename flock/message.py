@@ -8,9 +8,11 @@ class FlockMessage(object):
 
     class Type(object):
         # controller messages
-        report = 0
-        set  = 1
-        pair = 2
+        report      = 0
+        set         = 1
+        set_reply   = 2
+        pair        = 3
+        pair_reply  = 4
         # system messages
 
     MSG_TYPE_REPORT = 0
@@ -31,8 +33,6 @@ class FlockMessage(object):
         self.uid = None
         self.device = None
         self.namespace = None
-
-        # obsolete fields. @todo : remove
         self.attributes = {}
 
     def __eq__(self, other):

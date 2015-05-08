@@ -36,6 +36,15 @@ class FlockRPC(MsgpackRPCPubServer):
         d = router.call(message)
         return d
 
+    def remote_pair(self, protocol):
+        router = Router.instantiate()
+        message = FlockMessage()
+        message.type = FlockMessage.Type.pair
+        message.namespace = protocol
+        d = router.call(message)
+        return d
+
+
 class FlockMsgServer(object):
     def __init__(self):
         server = FlockRPC()

@@ -96,11 +96,35 @@ class RfxcomMessageTestCase(TestCase):
         dump_packet = packet.dump()
         self.assertEqual(packet_data, dump_packet)
 
-    def test_dump_rfy(self):
+    def test_dump_rfy_pair(self):
         expected_packet = '\x0c\x1a\x00\x00\x0f\xff\xff\x01\x07\x00\x00\x00\x00'
         packet = Packet()
         packet.id = 0x0FFFFF
         packet.type = Packet.Type.rfy
         packet.command = Packet.Command.pair
+        self.assertEqual(expected_packet, packet.dump())
+        return
+
+    def test_dump_rfy_true(self):
+        ''' True is mapped on 'up', i.e. shutter open.
+        '''
+        expected_packet = '\x0c\x1a\x00\x00\x0f\xff\xff\x01\x01\x00\x00\x00\x00'
+        packet = Packet()
+        packet.id = 0x0FFFFF
+        packet.type = Packet.Type.rfy
+        packet.attr_state = True
+        packet.command = Packet.Command.set
+        self.assertEqual(expected_packet, packet.dump())
+        return
+
+    def test_dump_rfy_false(self):
+        ''' False is mapped on 'down', i.e. shutter closed.
+        '''
+        expected_packet = '\x0c\x1a\x00\x00\x0f\xff\xff\x01\x01\x00\x00\x00\x00'
+        packet = Packet()
+        packet.id = 0x0FFFFF
+        packet.type = Packet.Type.rfy
+        packet.attr_state = True
+        packet.command = Packet.Command.set
         self.assertEqual(expected_packet, packet.dump())
         return

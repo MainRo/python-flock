@@ -81,11 +81,10 @@ class Router(object):
         """
         roster = Roster.instantiate()
         device = roster.get_device(message.uid)
-        if device is None:
-            return None
+        message.device = device
 
         for handler in self.handlers:
-            d = handler.invoke(device, message)
+            d = handler.invoke(message)
             if d != None:
                 return d
 

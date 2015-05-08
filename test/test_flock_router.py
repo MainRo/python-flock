@@ -66,7 +66,11 @@ class RouterTestCase(TestCase):
         message = FlockMessage()
         message.uid = '42'
         router.call(message)
-        handler.invoke.assert_called_once_with(device, message)
+
+        expected_message = FlockMessage()
+        expected_message.uid = '42'
+        expected_message.device = device
+        handler.invoke.assert_called_once_with(expected_message)
 
     @patch('flock.router.Roster')
     def test_call_on_one_controller(self, mock_roster):
@@ -84,8 +88,12 @@ class RouterTestCase(TestCase):
         message = FlockMessage()
         message.uid = '42'
         router.call(message)
-        handler1.invoke.assert_called_once_with(device, message)
-        handler2.invoke.assert_called_once_with(device, message)
+
+        expected_message = FlockMessage()
+        expected_message.uid = '42'
+        expected_message.device = device
+        handler1.invoke.assert_called_once_with(expected_message)
+        handler2.invoke.assert_called_once_with(expected_message)
 
     """
     @patch.object(FlockController, 'start')

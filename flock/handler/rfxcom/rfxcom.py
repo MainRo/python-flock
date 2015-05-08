@@ -15,27 +15,30 @@ class RfxcomHandler(RfxcomProtocol):
         self.router = Router.instantiate()
         self.reactor = reactor
 
-    def invoke(self, device, message):
-        if message.namespace == 'controller' and device.protocol == 'rfxcom':
-            if message.type == FlockMessage.Type.set:
-                return self.__set(device, message)
+    def invoke(self, message):
+        if message.namespace == 'controller':
+            if message.device != None:
+                if message.device.protocol == 'rfxcom' or message.device.protocol == 'rfxcom:rfy':
+                    if message.type == FlockMessage.Type.set:
+                        return self.__set(message.device, message)
         return None
 
     def __set(self, device, message):
         packet = self._message_to_packet(device, message)
         d = self.send_packet(packet.dump())
-        d.addCallback(self._packet_to_message)
+        d.addCallback(self.__packet_to_message)
         return d
 
     def publish_packet(self, packet):
-        self.router.publish(self._packet_to_message(packet))
+        self.router.publish(self.__packet_to_message(packet))
         return
 
-    def _packet_to_message(self, packet):
+    def __packet_to_message(self, packet):
         """ Converts an rfxcom packet to a message
         """
         if packet == None:
             return None
+#            raise RuntimeError('received packet is None')
 
         device = self.roster.get_device(packet.id, 'rfxcom')
         if device == None:

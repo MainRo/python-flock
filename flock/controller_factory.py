@@ -1,6 +1,6 @@
 import os, string
 
-from flock.handler.rfxcom.rfxcom import RfxcomHandler
+from flock.handler.rfxcom.rfy import RfyHandler
 from flock.controller.rfxcom.transport import RfxcomTransport
 from flock.handler.enocean import EnoceanHandler
 from flock.controller.enocean.transport import EnoceanTransport
@@ -21,7 +21,7 @@ class ControllerFactory(object):
     def controller_added(self, path):
         handler = None
         if string.find(path, 'RFXCOM_RFXtrx433') >= 0:
-            handler = RfxcomHandler(self.reactor)
+            handler = RfyHandler(self.reactor)
             RfxcomTransport(handler, path, self.reactor)
         elif string.find(path, 'EnOcean_GmbH_EnOcean_USB_300') >= 0:
             handler = EnoceanHandler(self.reactor)

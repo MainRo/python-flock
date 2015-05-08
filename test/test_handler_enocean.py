@@ -1,9 +1,9 @@
-from unittest import TestCase
+from unittest import TestCase, skip
 from mock import MagicMock
 from twisted.internet import reactor, defer
 from flock.controller.enocean.packet import Packet
 from flock.handler.enocean import EnoceanHandler
-from flock.roster import Roster, Device
+from flock.roster import Device
 from flock.message import FlockMessage
 
 class TestController(object):
@@ -16,13 +16,15 @@ class TestController(object):
 class EnoceanHandlerTestCase(TestCase):
     def test_invoke(self):
         handler = EnoceanHandler(reactor)
-        self.assertIs(None, handler.invoke(Device(protocol='enocean', protocol_id='42'), FlockMessage()))
-
+        message = FlockMessage()
+        message.device = Device(protocol='enocean', protocol_id='42')
+        self.assertIs(None, handler.invoke(message))
 
     def test_publish_packet(self):
         handler = EnoceanHandler(reactor)
         device = Device(protocol='enocean', protocol_id='42')
         device.uid = 'DKEJUFKD'
+        handler.roster = MagicMock()
         handler.roster.get_device = MagicMock(return_value=device)
         handler.router.publish = MagicMock()
 
