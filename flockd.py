@@ -1,11 +1,13 @@
 #! /usr/bin/python
 
-from optparse import OptionParser
 import logging
 import os.path
+import argparse
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol
+
+from flock.roster import Roster
 
 from flock.controller_factory import ControllerFactory
 from flock.controller.rfxcom.protocol import RfxcomProtocol
@@ -18,24 +20,21 @@ from flock.frontend.msgpack.server import FlockMsgServer
 
 
 if __name__ == '__main__':
-    parser = OptionParser()
-    parser.add_option("-v", "--verbose", dest="verbose", default=0,
-            help="verbose level 0-2")
-    parser.add_option("-w", "--http", dest="http", default=None,
-            help="http frontend server url")
-    parser.add_option("-p", "--port", dest="port", default=7109,
-            help="tcp frontend server port")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', help='configuration file')
+    parser.add_argument('-v', '--verbose', help='verbose level', nargs='?', default=0)
+    parser.add_argument('-p', '--port', help="tcp frontend server port", default=7109)
+    args = parser.parse_args()
 
-    (options, args) = parser.parse_args()
-
-    if options.verbose == '1':
+    if args.verbose == '1':
         logging.getLogger().setLevel(logging.INFO)
-    elif options.verbose == '2':
+    elif args.verbose == '2':
         logging.getLogger().setLevel(logging.DEBUG)
     else:
         logging.getLogger().setLevel(logging.CRITICAL)
 
+    Roster.instantiate(args.config)
     factory = ControllerFactory(reactor)
-    frontend = Frontend(options.port, reactor)
+    frontend = Frontend(args.port, reactor)
     msgpack_frontend = FlockMsgServer()
     reactor.run()
