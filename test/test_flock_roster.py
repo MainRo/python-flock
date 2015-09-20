@@ -7,12 +7,25 @@ from flock.roster import Roster, Device
 from twisted.internet import reactor
 
 class RosterTestCase(TestCase):
-    def test_instantiate(self):
+    def test_build(self):
+        Roster.roster_instance = None
         roster = Roster()
         self.assertEqual('.flock_roster', os.path.basename(roster._file))
 
         roster = Roster('foo')
         self.assertEqual('foo', roster._file)
+
+    def test_instantiate(self):
+        test_path = '/tmp/roster_foo.json'
+        Roster.roster_instance = None
+        roster = Roster.instantiate(test_path)
+        self.assertEqual(test_path, roster._file)
+
+        test_path = '/tmp/roster_foo2.json'
+        Roster.roster_instance = None
+        roster = Roster.instantiate(test_path)
+        self.assertEqual(test_path, roster._file)
+
 
     def test_add_device(self):
         fd,file = tempfile.mkstemp()

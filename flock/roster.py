@@ -70,12 +70,12 @@ class Roster(object):
         return
 
     @staticmethod
-    def instantiate():
+    def instantiate(filepath = None):
         """ Returns the singleton instance of the device roster. Always use
             this method to get the reference to the roster.
         """
         if Roster.roster_instance == None:
-            Roster.roster_instance = Roster()
+            Roster.roster_instance = Roster(filepath)
         return Roster.roster_instance
 
     def add_device(self, device):
