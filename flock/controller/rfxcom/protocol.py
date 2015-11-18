@@ -200,6 +200,12 @@ class RfxcomProtocol(RfxcomReceiver):
         RfxcomReceiver.__init__(self)
         self.__hsm = None
 
+    def call_later(self, date, callback):
+        '''
+            @todo : reactor must not depend on inheritance
+        '''
+        self.reactor.callLater(date, callback, None)
+
     def connectionMade(self):
         """ Resets the controller.
         """
@@ -231,6 +237,6 @@ class RfxcomProtocol(RfxcomReceiver):
         self.__hsm.send_packet(packet)
         # simulate systematic success for now
         # @todo : call deferred when answer is received
-        self.reactor.callLater(0, d.callback, None)
+        self.call_later(0, d.callback)
         return d;
 

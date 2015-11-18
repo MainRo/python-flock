@@ -9,8 +9,9 @@ class Device(object):
     def __init__(self, **kwargs):
         """ Creates a new device with the provided attributes. Mandatory
             attributes:
-            - protocol
-            - protocol_id
+            - protocol : a string representing the protocol
+            - protocol_id :
+
         """
         if 'repr' in kwargs:
             self.uid = kwargs['repr']['uid']
@@ -20,7 +21,7 @@ class Device(object):
             self.private= kwargs['repr']['private']
         else:
             self.uid = None
-            self.protocol = kwargs['protocol']
+            self.protocol = str(kwargs['protocol'])
             self.protocol_id = kwargs['protocol_id']
             self.features = []
             self.private = {}
@@ -45,14 +46,16 @@ class Device(object):
 
     def __repr__(self):
         ret = '{'
-        ret += '\'uid\':\'' + self.uid + '\','
+        if self.uid != None:
+            ret += '\'uid\':\'' + self.uid + '\','
+        else:
+            ret += '\'uid\':\'None\','
         ret += '\'protocol\':\'' + self.protocol + '\','
-        ret += '\'protocol_id\':\'' + self.protocol_id + '\','
+        ret += '\'protocol_id\':\'' + str(self.protocol_id) + '\','
         ret += '\'features\':' + repr(self.features) + ','
         ret += '\'private\':' + repr(self.private)
         ret += '}'
         return ret
-
 
 class Roster(object):
     roster_instance = None

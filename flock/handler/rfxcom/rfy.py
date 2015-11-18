@@ -32,7 +32,7 @@ class RfyHandler(RfxcomHandler):
             packet.type = Packet.Type.rfy
             packet.command = Packet.Command.pair
             d = self.send_packet(packet.dump())
-#            d.addCallback(self._packet_to_message)
+            d.addCallback(self.__on_pair_completed, unit_id)
         else:
             d = defer.Deferred()
             self.reactor.callLater(0, d.errback, -1)
@@ -42,30 +42,29 @@ class RfyHandler(RfxcomHandler):
     def __generate_unit_id(self):
         unit_id = 1
         retry_count = 30 # rfxcom supports up to 30 remotes
-        roster = Roster.instantiate()
         while retry_count > 0:
-            if roster.get_device(str(unit_id), 'rfxcom:rfy') == None:
+            if self.roster.get_device(unit_id, 'rfxcom:rfy') == None:
                 return unit_id
             retry_count-=1
             unit_id += 1
         return None
 
-    def __packet_to_message(self, packet):
-        ''' Converts a pairing notification packet to a message.
-            If pairing succeeded, then a new device is created. Otherwise an
-            error is returned to errback.
+    def __add_device(self, unit_id):
+        ''' adds a new device to the roster.
         '''
-        if packet == None:
-            raise RuntimeError('received packet is None')
-
-        device = Device(protocol='rfxcom:rfy', protocol_id=packet.id)
-        device.set_private({'type': packet.type, 'unit_code': 1})
+        device = Device(protocol='rfxcom:rfy', protocol_id=unit_id)
+        device.set_private({'type': Packet.Type.rfy, 'unit_code': 1})
         if self.roster.add_device(device) == None:
             raise RuntimeError('unable to add device to roster')
+        return device
 
+    def __on_pair_completed(self, packet, unit_id):
+        device = self.__add_device(unit_id)
         message = FlockMessage()
         message.uid = device.uid
         message.namespace = 'controller:rts'
         message.type = FlockMessage.Type.pair_reply
         return message
+
+
 

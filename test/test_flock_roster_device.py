@@ -11,6 +11,11 @@ class DeviceTestCase(TestCase):
         self.assertEqual({}, device.private)
         self.assertEqual([], device.features)
 
+    def test_non_str_attributes(self):
+        device = Device(protocol_id=4242, protocol=27)
+        self.assertEqual(4242, device.protocol_id)
+        self.assertEqual('27', device.protocol)
+
     def test_features(self):
         device = Device(protocol_id='4242', protocol='test')
         device.set_features('one', 'two', 'three')

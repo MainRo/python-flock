@@ -5,31 +5,57 @@ from twisted.internet import reactor, defer
 from flock.handler.rfxcom.rfy import RfyHandler
 from flock.message import FlockMessage
 
+
 class RfyHandlerTestCase(TestCase):
     ''' tests for rfxcom rfy handler (alias somfy rts).
         @todo : test several pairing, add checks on roster device creation.
     '''
 
-    def test_pair(self):
+    @patch('flock.handler.rfxcom.rfy.Roster')
+    def test_pair(self, mock_roster):
+        mock_roster.get_device.side_effect = [ None  ]
+        mock_roster.instantiate = MagicMock(return_value=mock_roster)
+
         d = defer.Deferred()
         handler = RfyHandler(reactor)
-        handler.send_packet = MagicMock(return_value = d)
+        handler.send_packet = MagicMock()
+        handler.send_packet.side_effect = [d]
 
+        # send pair request
         message = FlockMessage()
         message.namespace = 'controller:rts'
         message.type = FlockMessage.Type.pair
 
         pair_defer = handler.invoke(message)
+        pair_defer.callback(None)
+
+        # Check roster calls
         self.assertEqual(d, pair_defer)
+        id,protocol = mock_roster.get_device.call_args[0]
+        self.assertEqual(1, id)
+        self.assertEqual('rfxcom:rfy', protocol)
+
+        self.assertEqual(1, mock_roster.add_device.call_count)
+        device, = mock_roster.add_device.call_args[0]
+        self.assertEqual(1, device.protocol_id)
+
+        # check sent packet
+        self.assertEqual(1, handler.send_packet.call_count)
+        args_list = handler.send_packet.call_args_list
+        i=0
+        while i < 1:
+            args, kwargs = args_list[i]
+            actual_id = ord(args[0][6])
+            self.assertEqual(i+1, actual_id)
+            i += 1
+
         return
 
 
     @patch('flock.handler.rfxcom.rfy.Roster')
     def test_pair_many(self, mock_roster):
-        roster = MagicMock()
-        roster.get_device = MagicMock()
-        roster.get_device.side_effect = [ None, {}, None, {}, {}, None ]
-        mock_roster.instantiate = MagicMock(return_value=roster)
+        mock_roster.get_device.side_effect = [ None, {}, None, {}, {}, None ]
+        mock_roster.instantiate = MagicMock(return_value=mock_roster)
 
         d = defer.Deferred()
         handler = RfyHandler(reactor)
